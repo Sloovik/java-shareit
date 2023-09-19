@@ -56,7 +56,6 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleAccessException(final AccessException e) {
@@ -64,9 +63,9 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({NotFoundException.class, BookingItemByOwnerException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(final NotFoundException e) {
+    public ErrorResponse handleNotFoundException(final Exception e) {
         log.error("Not found error. Status 404! {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
