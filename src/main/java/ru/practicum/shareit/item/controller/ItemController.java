@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -28,10 +30,10 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto findById(@PathVariable Long itemId) {
-        log.info("GET request to find item by item id: {}", itemId);
-        return itemService.findById(itemId);
+    public ItemDto findById(@RequestHeader(name = USER_ID_HEADER) Long userId, @PathVariable Long itemId) {
+        return itemService.findById(userId, itemId);
     }
+
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam("text") String text) {
@@ -53,4 +55,11 @@ public class ItemController {
         return itemService.update(userId, itemId, itemDto);
     }
 
+    @PostMapping("/{itemId}/comment")
+    public CommentDto createComment(@RequestHeader(name = USER_ID_HEADER) Long userId,
+                                    @PathVariable Long itemId,
+                                    @Valid @RequestBody CommentRequestDto commentDto) {
+        log.info("POST request to create comment by userId: {} for itemId: {} and commentDto: {}", userId, itemId, commentDto);
+        return itemService.createComment(userId, itemId, commentDto);
+    }
 }

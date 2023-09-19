@@ -7,8 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.exception.AccessException;
-import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.*;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -50,9 +49,17 @@ public class ErrorHandler {
         return new ErrorResponse("Validation error: " + errorMessage);
     }
 
+    @ExceptionHandler({ValidationException.class, AvailableException.class, StateException.class, AvailableException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBadRequestException(final Exception e) {
+        log.error("Available error. Status 400! {}", e.getMessage(), e);
+        return new ErrorResponse(e.getMessage());
+    }
+
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleValidationException(final AccessException e) {
+    public ErrorResponse handleAccessException(final AccessException e) {
         log.error("Access error. Status 403! {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
