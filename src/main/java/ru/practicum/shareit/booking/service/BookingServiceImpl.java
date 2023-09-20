@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.booking.model.State.parseState;
+
 @Service
 @AllArgsConstructor
 public class BookingServiceImpl implements BookingService {
@@ -127,7 +129,7 @@ public class BookingServiceImpl implements BookingService {
                         String.format("Item with id %x not found!", bookingRequestDto.getItemId())));
 
         if (!item.getAvailable()) {
-            throw new AvailableException(String.format("Item with id %x is not available!", item.getId()));
+            throw new InvalidStateException(String.format("Item with id %x is not available!", item.getId()));
         }
 
         if (bookingRequestDto.getStart().isAfter(bookingRequestDto.getEnd()) ||
@@ -155,7 +157,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (approved && booking.getStatus() == Status.APPROVED) {
-            throw new AvailableException(String.format("The booking with id %x already has the status APPROVED", bookingId));
+            throw new InvalidStateException(String.format("The booking with id %x already has the status APPROVED", bookingId));
         }
 
         if (approved) {
@@ -167,12 +169,6 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toDto(bookingRepository.save(booking));
     }
 
-    private State parseState(String state) {
-        try {
-            return State.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new StateException(String.format("Unknown state: %s", state));
-        }
-    }
+
 
 }

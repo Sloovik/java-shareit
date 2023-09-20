@@ -6,7 +6,7 @@ import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessException;
-import ru.practicum.shareit.exception.AvailableException;
+import ru.practicum.shareit.exception.InvalidStateException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
@@ -117,7 +117,7 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException(String.format("Item with id %x not found!", itemId)));
 
         if (bookingRepository.findBookingsForAddComments(itemId, userId, LocalDateTime.now()).isEmpty()) {
-            throw new AvailableException(String.format("You don't add comment for item with id: %x", itemId));
+            throw new InvalidStateException(String.format("You don't add comment for item with id: %x", itemId));
         }
 
         return commentMapper.toDto(commentRepository.save(commentMapper.toComment(commentRequestDto, item, author)));
