@@ -53,7 +53,7 @@ public class ErrorHandler {
             PageableParamsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestException(final Exception e) {
-        log.error("Available error. Status 400! {}", e.getMessage(), e);
+        log.error("Availability error. Status 400! {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 

@@ -31,6 +31,7 @@ public class ItemController {
     public List<ItemDto> findByUserId(@RequestHeader(name = HttpHeaders.USER_ID_HEADER) Long userId,
                                       @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                       @Positive @RequestParam(defaultValue = "10") Integer size) {
+        log.info("GET request to find by user id: {}", userId);
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("id"));
 
         return itemService.findByUserId(userId, pageable);
@@ -38,6 +39,7 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ItemDto findById(@RequestHeader(name = HttpHeaders.USER_ID_HEADER) Long userId, @PathVariable Long itemId) {
+        log.info("GET request to find by id: {} and itemId: {}", userId, itemId);
         return itemService.findById(userId, itemId);
     }
 
@@ -46,6 +48,7 @@ public class ItemController {
     public List<ItemDto> search(@RequestParam("text") String text,
                                 @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                 @Positive @RequestParam(defaultValue = "10") Integer size) {
+        log.info("GET request to search text: {}", text);
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("id"));
 
         return itemService.search(text, pageable);
