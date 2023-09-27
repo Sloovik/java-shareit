@@ -49,7 +49,7 @@ public class ErrorHandler {
         return new ErrorResponse("Validation error: " + errorMessage);
     }
 
-    @ExceptionHandler({ValidationException.class, InvalidStateException.class, StateException.class, InvalidStateException.class,
+    @ExceptionHandler({ValidationException.class, InvalidStateException.class, StateException.class,
             PageableParamsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestException(final Exception e) {
