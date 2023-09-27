@@ -16,21 +16,19 @@ import ru.practicum.shareit.user.model.User;
 @AllArgsConstructor
 public class BookingMapper {
 
-    private final UserMapper userMapper;
-    private final ItemMapper itemMapper;
 
-    public BookingDto toDto(Booking booking) {
+    public static BookingDto toDto(Booking booking) {
         return BookingDto.builder()
                 .id(booking.getId())
                 .start(booking.getStartDate())
                 .end(booking.getEndDate())
-                .item(booking.getItem() != null ? itemMapper.toDto(booking.getItem()) : null)
-                .booker(userMapper.toDto(booking.getBooker()))
+                .item(booking.getItem() != null ? ItemMapper.toDto(booking.getItem()) : null)
+                .booker(UserMapper.toDto(booking.getBooker()))
                 .status(booking.getStatus())
                 .build();
     }
 
-    public BookingItemDto toBookingItemDto(Booking booking) {
+    public static BookingItemDto toBookingItemDto(Booking booking) {
         return BookingItemDto.builder()
                 .id(booking.getId())
                 .start(booking.getStartDate())
@@ -39,7 +37,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public Booking toBookingFromRequest(BookingRequestDto bookingRequestDto, Item item, User booker) {
+    public static Booking toBookingFromRequest(BookingRequestDto bookingRequestDto, Item item, User booker) {
         return Booking.builder()
                 .id(bookingRequestDto.getId())
                 .startDate(bookingRequestDto.getStart())
