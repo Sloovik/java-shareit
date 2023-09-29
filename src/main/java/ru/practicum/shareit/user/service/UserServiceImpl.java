@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -13,15 +14,15 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    private final UserMapper userMapper;
     private final UserRepository userRepository;
 
     @Override
     public List<UserDto> getAll() {
         return userRepository.findAll().stream()
-                .map(userMapper::toDto)
+                .map(UserMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -30,15 +31,17 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %x not found!", userId)));
 
-        return userMapper.toDto(user);
+        return UserMapper.toDto(user);
     }
 
     @Override
+    @Transactional
     public UserDto create(UserDto userDto) {
-        return userMapper.toDto(userRepository.save(userMapper.toUser(userDto)));
+        return UserMapper.toDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
     @Override
+    @Transactional
     public UserDto update(Long userId, UserDto userDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %x not found!", userId)));
@@ -51,10 +54,11 @@ public class UserServiceImpl implements UserService {
             user.setName(userDto.getName());
         }
 
-        return userMapper.toDto(userRepository.save(user));
+        return UserMapper.toDto(userRepository.save(user));
     }
 
     @Override
+    @Transactional
     public void delete(Long userId) {
         userRepository.deleteById(userId);
     }

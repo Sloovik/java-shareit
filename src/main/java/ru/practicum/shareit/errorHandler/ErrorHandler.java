@@ -49,10 +49,11 @@ public class ErrorHandler {
         return new ErrorResponse("Validation error: " + errorMessage);
     }
 
-    @ExceptionHandler({ValidationException.class, InvalidStateException.class, StateException.class, InvalidStateException.class})
+    @ExceptionHandler({ValidationException.class, InvalidStateException.class, StateException.class,
+            PageableParamsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestException(final Exception e) {
-        log.error("Available error. Status 400! {}", e.getMessage(), e);
+        log.error("Availability error. Status 400! {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 

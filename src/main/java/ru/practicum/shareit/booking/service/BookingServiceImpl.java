@@ -1,7 +1,9 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -25,16 +27,14 @@ import static ru.practicum.shareit.booking.model.State.parseState;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
-
-    private final BookingMapper bookingMapper;
-
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
 
     @Override
-    public List<BookingDto> getAllBookingsForUser(Long userId, String state) {
+    public List<BookingDto> getAllBookingsForUser(Long userId, String state, Pageable pageable) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %x not found!", userId)));
 
@@ -44,30 +44,30 @@ public class BookingServiceImpl implements BookingService {
 
         switch (stateVal) {
             case ALL:
-                bookings = bookingRepository.findAllForBooker(userId);
+                bookings = bookingRepository.findAllForBooker(userId, pageable);
                 break;
 
             case PAST:
-                bookings = bookingRepository.findPastBookingsForBooker(userId, LocalDateTime.now());
+                bookings = bookingRepository.findPastBookingsForBooker(userId, LocalDateTime.now(), pageable);
                 break;
 
             case FUTURE:
-                bookings = bookingRepository.findFutureBookingsForBooker(userId, LocalDateTime.now());
+                bookings = bookingRepository.findFutureBookingsForBooker(userId, LocalDateTime.now(), pageable);
                 break;
 
             case CURRENT:
-                bookings = bookingRepository.findCurrentBookingsForBooker(userId, LocalDateTime.now());
+                bookings = bookingRepository.findCurrentBookingsForBooker(userId, LocalDateTime.now(), pageable);
                 break;
 
             case WAITING:
-                bookings = bookingRepository.findWaitingBookingsForBooker(userId);
+                bookings = bookingRepository.findWaitingBookingsForBooker(userId, pageable);
                 break;
 
             case REJECTED:
-                bookings = bookingRepository.findRejectedBookingsForBooker(userId);
+                bookings = bookingRepository.findRejectedBookingsForBooker(userId, pageable);
         }
 
-        return bookings.stream().map(bookingMapper::toDto).collect(Collectors.toList());
+        return bookings.stream().map(BookingMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
@@ -80,15 +80,15 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException(String.format("User with id %x is not the owner of item or booking", userId));
         }
 
-        return bookingMapper.toDto(booking);
+        return BookingMapper.toDto(booking);
     }
 
     @Override
-    public List<BookingDto> getAllItemsBookingForUser(Long userId, String state) {
+    public List<BookingDto> getAllItemsBookingForUser(Long userId, String state, Pageable pageable) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %x not found!", userId)));
 
-        List<Item> items = itemRepository.findByOwnerId(userId);
+        List<Item> items = itemRepository.findByOwnerId(userId, null);
         List<Long> itemsIds = items.stream().map(Item::getId).collect(Collectors.toList());
         List<Booking> bookings = new ArrayList<>();
 
@@ -96,33 +96,34 @@ public class BookingServiceImpl implements BookingService {
 
         switch (stateVal) {
             case ALL:
-                bookings = bookingRepository.findAllForItems(itemsIds);
+                bookings = bookingRepository.findAllForItems(itemsIds, pageable);
                 break;
 
             case PAST:
-                bookings = bookingRepository.findPastBookingsForItems(itemsIds, LocalDateTime.now());
+                bookings = bookingRepository.findPastBookingsForItems(itemsIds, LocalDateTime.now(), pageable);
                 break;
 
             case FUTURE:
-                bookings = bookingRepository.findFutureBookingsForItems(itemsIds, LocalDateTime.now());
+                bookings = bookingRepository.findFutureBookingsForItems(itemsIds, LocalDateTime.now(), pageable);
                 break;
 
             case CURRENT:
-                bookings = bookingRepository.findCurrentBookingsForItems(itemsIds, LocalDateTime.now());
+                bookings = bookingRepository.findCurrentBookingsForItems(itemsIds, LocalDateTime.now(), pageable);
                 break;
 
             case WAITING:
-                bookings = bookingRepository.findWaitingBookingsForItems(itemsIds);
+                bookings = bookingRepository.findWaitingBookingsForItems(itemsIds, pageable);
                 break;
 
             case REJECTED:
-                bookings = bookingRepository.findRejectedBookingsForItems(itemsIds);
+                bookings = bookingRepository.findRejectedBookingsForItems(itemsIds, pageable);
         }
 
-        return bookings.stream().map(bookingMapper::toDto).collect(Collectors.toList());
+        return bookings.stream().map(BookingMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public BookingDto create(Long userId, BookingRequestDto bookingRequestDto) {
         Item item = itemRepository.findById(bookingRequestDto.getItemId())
                 .orElseThrow(() -> new NotFoundException(
@@ -144,10 +145,11 @@ public class BookingServiceImpl implements BookingService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %x not found!", userId)));
 
-        return bookingMapper.toDto(bookingRepository.save(bookingMapper.toBookingFromRequest(bookingRequestDto, item, user)));
+        return BookingMapper.toDto(bookingRepository.save(BookingMapper.toBookingFromRequest(bookingRequestDto, item, user)));
     }
 
     @Override
+    @Transactional
     public BookingDto updateStatus(Long userId, Long bookingId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException(String.format("Booking with id %x not found!", bookingId)));
@@ -166,9 +168,8 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(Status.REJECTED);
         }
 
-        return bookingMapper.toDto(bookingRepository.save(booking));
+        return BookingMapper.toDto(bookingRepository.save(booking));
     }
-
 
 
 }

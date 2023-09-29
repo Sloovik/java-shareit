@@ -4,7 +4,7 @@ import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -23,6 +23,6 @@ public class ItemRequest {
     @JoinColumn(name = "requestor_id")
     private User requestor;
     @Builder.Default
-    private LocalDate created = LocalDate.now();
+    private LocalDateTime created = LocalDateTime.now();
 
 }
