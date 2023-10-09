@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
-import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.constraints.NotBlank;
@@ -30,8 +29,6 @@ public class ItemDto {
     private Boolean available;
 
     private UserDto owner;
-
-    private ItemRequestDto request;
 
     private Long requestId;
 
