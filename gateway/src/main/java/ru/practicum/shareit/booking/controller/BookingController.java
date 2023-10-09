@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.client.BookingClient;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
-import ru.practicum.shareit.booking.model.State;
-import ru.practicum.shareit.exception.InvalidStateException;
 import ru.practicum.shareit.utils.HttpHeaders;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+
+import static ru.practicum.shareit.booking.dto.State.parseState;
 
 @Validated
 @RestController
@@ -62,14 +62,6 @@ public class BookingController {
     public ResponseEntity<Object> updateStatus(@RequestHeader(name = HttpHeaders.USER_ID_HEADER) Long userId,
                                                @PathVariable Long bookingId, @RequestParam Boolean approved) {
         return bookingClient.updateStatus(userId, bookingId, approved);
-    }
-
-    private State parseState(String state) {
-        try {
-            return State.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidStateException(String.format("Unknown state: %s", state));
-        }
     }
 
 }

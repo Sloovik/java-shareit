@@ -36,7 +36,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository requestRepository;
 
     public List<ItemRequestWithItemsDto> findAllByUserId(Long userId) {
-        checkExistsAndGetUser(userId);
+        getUserThrowable(userId);
 
         List<ItemRequest> requests = requestRepository.findItemRequestByRequestorId(userId,
                 Sort.by("created").descending());
@@ -45,7 +45,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     public List<ItemRequestWithItemsDto> findAll(Long userId, Pageable pageable) {
-        checkExistsAndGetUser(userId);
+        getUserThrowable(userId);
 
         List<ItemRequest> itemRequests = requestRepository.findAllByRequestorIdIsNot(userId, pageable);
 
@@ -53,7 +53,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     public ItemRequestWithItemsDto findById(Long userId, Long requestId) {
-        checkExistsAndGetUser(userId);
+        getUserThrowable(userId);
 
         ItemRequest itemRequest = requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException(String.format("Request with id %x not found!", requestId)));
@@ -67,7 +67,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional
     public ItemRequestResponseDto create(Long userId, CreateItemRequestDto itemRequestDto) {
         ItemRequest itemRequest = ItemRequestMapper.createItemRequestToItemRequest(itemRequestDto);
-        User user = checkExistsAndGetUser(userId);
+        User user = getUserThrowable(userId);
 
         itemRequest.setRequestor(user);
         itemRequest.setCreated(LocalDateTime.now());
@@ -93,7 +93,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return itemRequestsWithItems;
     }
 
-    private User checkExistsAndGetUser(Long userId) {
+    private User getUserThrowable(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %x not found!", userId)));
     }

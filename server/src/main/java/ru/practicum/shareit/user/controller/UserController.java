@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -32,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping()
-    public UserDto create(@Valid @RequestBody UserDto user) {
+    public UserDto create(@RequestBody UserDto user) {
         log.info("POST request to create user: {}", user);
         return userService.create(user);
     }

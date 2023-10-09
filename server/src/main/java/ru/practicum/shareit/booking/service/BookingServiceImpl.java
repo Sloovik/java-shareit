@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.booking.model.State.parseState;
-
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
@@ -37,15 +35,13 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
 
     @Override
-    public List<BookingDto> getAllBookingsForUser(Long userId, String state, Pageable pageable) {
+    public List<BookingDto> getAllBookingsForUser(Long userId, State state, Pageable pageable) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %x not found!", userId)));
 
         List<Booking> bookings = new ArrayList<>();
 
-        State stateVal = parseState(state);
-
-        switch (stateVal) {
+        switch (state) {
             case ALL:
                 bookings = bookingRepository.findAllForBooker(userId, pageable);
                 break;
@@ -87,17 +83,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllItemsBookingForUser(Long userId, String state, Pageable pageable) {
+    public List<BookingDto> getAllItemsBookingForUser(Long userId, State state, Pageable pageable) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with id %x not found!", userId)));
 
         List<Item> items = itemRepository.findByOwnerId(userId, null);
         List<Long> itemsIds = items.stream().map(Item::getId).collect(Collectors.toList());
         List<Booking> bookings = new ArrayList<>();
-
-        State stateVal = parseState(state);
-
-        switch (stateVal) {
+        switch (state) {
             case ALL:
                 bookings = bookingRepository.findAllForItems(itemsIds, pageable);
                 break;
