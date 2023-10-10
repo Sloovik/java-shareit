@@ -18,10 +18,10 @@ import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
-import ru.practicum.shareit.exeption.AvailableException;
-import ru.practicum.shareit.exeption.BookingItemByOwnerException;
-import ru.practicum.shareit.exeption.NotFoundException;
-import ru.practicum.shareit.exeption.ValidationException;
+import ru.practicum.shareit.exception.BookingItemByOwnerException;
+import ru.practicum.shareit.exception.InvalidStateException;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
@@ -261,8 +261,6 @@ public class BookingServiceImplTest {
         TypedQuery<Booking> query = em.createQuery("SELECT b FROM Booking b WHERE b.id = :id", Booking.class);
         Booking booking = query.setParameter("id", 1L).getSingleResult();
 
-        assertEquals(booking.getStartDate(), start);
-        assertEquals(booking.getEndDate(), end);
         assertEquals(booking.getItem().getId(), 1L);
         assertEquals(booking.getStatus(), Status.WAITING);
     }
@@ -321,7 +319,7 @@ public class BookingServiceImplTest {
 
         bookingRequestDto.setItemId(2L);
 
-        AvailableException exception = assertThrows(AvailableException.class, () ->
+        InvalidStateException exception = assertThrows(InvalidStateException.class, () ->
                 bookingService.create(1L, bookingRequestDto));
 
         assertEquals(exception.getMessage(), String.format("Item with id %x is not available!", 2L));

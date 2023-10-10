@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.model;
 
-import ru.practicum.shareit.exception.StateException;
+import ru.practicum.shareit.exception.InvalidStateException;
 
 public enum State {
     ALL,
@@ -14,7 +14,7 @@ public enum State {
         try {
             return State.valueOf(state);
         } catch (IllegalArgumentException e) {
-            throw new StateException(String.format("Unknown state: %s", state));
+            throw new InvalidStateException(String.format("Unknown state: %s", state));
         }
     }
 }

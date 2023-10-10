@@ -1,15 +1,11 @@
-package ru.practicum.shareit.exception;
+package java.ru.practicum.shareit.exception;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.errorHandler.ErrorHandler;
 import ru.practicum.shareit.errorHandler.ErrorResponse;
-import ru.practicum.shareit.exeption.AccessException;
-import ru.practicum.shareit.exeption.AvailableException;
-import ru.practicum.shareit.exeption.BookingItemByOwnerException;
-import ru.practicum.shareit.exeption.NotFoundException;
-import ru.practicum.shareit.exeption.ValidationException;
+import ru.practicum.shareit.exception.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -27,7 +23,7 @@ public class ErrorHandlerTest {
 
     @Test
     void testAvailableException() {
-        AvailableException exception = new AvailableException("Item with is not available!");
+        InvalidStateException exception = new InvalidStateException("Item with is not available!");
         ErrorResponse response = errorHandler.handleBadRequestException(exception);
         assertEquals(exception.getMessage(), response.getError());
     }
