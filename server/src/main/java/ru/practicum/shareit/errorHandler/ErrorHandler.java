@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.exception.*;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,21 +23,6 @@ public class ErrorHandler {
                 .getFieldErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.toList());
-
-        String errorMessage = errors.stream().findFirst().orElse("");
-
-        log.error("Validation error. Status 400! {}", errorMessage, e);
-
-        return new ErrorResponse("Validation error: " + errorMessage);
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final ConstraintViolationException e) {
-        List<String> errors = e.getConstraintViolations()
-                .stream()
-                .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
 
         String errorMessage = errors.stream().findFirst().orElse("");
